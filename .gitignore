@@ -1,2 +1,6 @@
 *.tab.*
 *.lex.*
+.*.swp
+*.output
+*.red
+[^.]*

@@ -1,16 +1,16 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "parser.h"
 #include "structs.h"
 #include "red.tab.h"
 
+InstrNode *nodes;
+InstrNode *lastNode;
+
 int main(int argc, char **argv){
-   nodes = malloc(sizeof(InstrNode));
-   nodes->next = NULL;
-   lastNode = nodes;
+   nodes= NULL;
+   lastNode = NULL;
    yyparse();
-   InstrNode *tmp = nodes;
-   nodes = nodes->next;
-   free(tmp);
    
    pc[0] = 0;
    process_idx = 0;
@@ -227,7 +227,7 @@ void addInstrs(){
 }
 
 void print_instr(CoreCell instr){
-   char *command;
+   const char *command;
    int arg1 = instr.arg1;
    int arg2 = instr.arg2;
    switch( instr.opcode ){

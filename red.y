@@ -3,9 +3,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "structs.h"
+#include "parser.h"
 extern int yychar, yydebug, yylineno;
 extern char *yytext;
+extern InstrNode *nodes;
+extern InstrNode *lastNode;
 int yylex();
 void yyerror(char *s);
 
@@ -100,7 +102,7 @@ modifier : MOD_A     {$$ = A;}
 //}
 
 InstrNode *addInstr(int opcode, int modifier, int mode_a, int arg1, int mode_b, int arg2){
-   InstrNode *node = malloc(sizeof(InstrNode));
+   InstrNode *node = (InstrNode *) malloc(sizeof(InstrNode));
    node->opcode = opcode;
    node->arg1 = arg1 % CORE_SIZE;
    node->arg2 = arg2 % CORE_SIZE;
@@ -110,9 +112,14 @@ InstrNode *addInstr(int opcode, int modifier, int mode_a, int arg1, int mode_b, 
 
    if( node->arg1 < 0 ){ node->arg1 += CORE_SIZE; }
    if( node->arg2 < 0 ){ node->arg2 += CORE_SIZE; }
-
-   lastNode->next = node;
-   lastNode = node;
+   if( nodes == NULL){
+      nodes = node;
+      lastNode = node;
+   }
+   else{
+      lastNode->next = node;
+      lastNode = node;
+   }
    return node;
 }
 
