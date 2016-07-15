@@ -1,9 +1,11 @@
-red : red.l red.y
-	bison -dvt red.y
-	flex -o red.lex.c red.l
-	g++ -Wall -std=c++11 -g -o test red.tab.c red.lex.c main.c
+CFLAGS=-Wall -std=c++11 -I interpreter
+
+red : interpreter/red.l interpreter/red.y
+	bison -dvt interpreter/red.ypp -o interpreter/red.tab.cpp
+	flex -o interpreter/red.lex.c interpreter/red.l
+	g++ ${CFLAGS} -g -o test interpreter/red.tab.cpp interpreter/red.lex.c interpreter/interpreter.cpp interpreter/main.cpp
 
 
 .PHONY : clean
 clean:
-	/bin/rm -f test red.lex.c red.tab.c red.tab.h 
+	/bin/rm -f test interpreter/red.lex.c interpreter/red.tab.c interpreter/red.tab.h interpreter/*.tab.* interpreter/*.lex.*
