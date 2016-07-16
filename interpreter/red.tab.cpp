@@ -69,6 +69,9 @@
 #include <string.h>
 #include "parser.h"
 #include <vector>
+#define CORE_SIZE 8000
+#define MAX_CYCLES 8000
+#define MAX_PROCESSES 8000
 using namespace std;
 extern int yychar, yydebug, yylineno;
 extern char *yytext;
@@ -79,7 +82,7 @@ InstrNode addInstr(int opcode, int modifier, int mode_a, int arg1, int mode_b, i
 void print_tok();
 std::vector<InstrNode> nodes;
 
-#line 83 "interpreter/red.tab.cpp" /* yacc.c:339  */
+#line 86 "interpreter/red.tab.cpp" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -150,7 +153,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 19 "interpreter/red.ypp" /* yacc.c:355  */
+#line 22 "interpreter/red.ypp" /* yacc.c:355  */
 
    char *charptr;
    char ch;
@@ -160,7 +163,7 @@ union YYSTYPE
    int addr_mode;
    int modifier;
 
-#line 164 "interpreter/red.tab.cpp" /* yacc.c:355  */
+#line 167 "interpreter/red.tab.cpp" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -177,7 +180,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 181 "interpreter/red.tab.cpp" /* yacc.c:358  */
+#line 184 "interpreter/red.tab.cpp" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -477,11 +480,11 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    44,    44,    45,    48,    49,    50,    51,    54,    57,
-      58,    59,    60,    61,    62,    63,    64,    65,    66,    67,
-      68,    69,    70,    71,    72,    73,    74,    75,    78,    79,
-      80,    81,    82,    83,    84,    85,    86,    89,    90,    91,
-      92,    93,    94,    95,    96
+       0,    47,    47,    48,    51,    52,    53,    54,    57,    60,
+      61,    62,    63,    64,    65,    66,    67,    68,    69,    70,
+      71,    72,    73,    74,    75,    76,    77,    78,    81,    82,
+      83,    84,    85,    86,    87,    88,    89,    92,    93,    94,
+      95,    96,    97,    98,    99
 };
 #endif
 
@@ -1289,235 +1292,235 @@ yyreduce:
   switch (yyn)
     {
         case 4:
-#line 48 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 51 "interpreter/red.ypp" /* yacc.c:1646  */
     {addInstr((yyvsp[-6].opcode), (yyvsp[-5].modifier), (yyvsp[-4].addr_mode), (yyvsp[-3].intcon), (yyvsp[-1].addr_mode), (yyvsp[0].intcon));}
-#line 1295 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1298 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 49 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 52 "interpreter/red.ypp" /* yacc.c:1646  */
     {addInstr((yyvsp[-3].opcode), (yyvsp[-2].modifier), (yyvsp[-1].addr_mode), (yyvsp[0].intcon), 0, 0);}
-#line 1301 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1304 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 57 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 60 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.opcode) = DAT;}
-#line 1307 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1310 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 58 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 61 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.opcode) = MOV;}
-#line 1313 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1316 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 59 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 62 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.opcode) = ADD;}
-#line 1319 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1322 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 60 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 63 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.opcode) = SUB;}
-#line 1325 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1328 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 61 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 64 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.opcode) = MUL;}
-#line 1331 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1334 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 62 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 65 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.opcode) = DIV;}
-#line 1337 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1340 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 63 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 66 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.opcode) = MOD;}
-#line 1343 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1346 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 64 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 67 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.opcode) = JMP;}
-#line 1349 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1352 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 65 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 68 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.opcode) = JMZ;}
-#line 1355 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1358 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 66 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 69 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.opcode) = DJN;}
-#line 1361 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1364 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 67 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 70 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.opcode) = SPL;}
-#line 1367 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1370 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 68 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 71 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.opcode) = CMP;}
-#line 1373 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1376 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 69 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 72 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.opcode) = SEQ;}
-#line 1379 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1382 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 70 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 73 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.opcode) = SNE;}
-#line 1385 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1388 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 71 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 74 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.opcode) = SLT;}
-#line 1391 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1394 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 72 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 75 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.opcode) = LDP;}
-#line 1397 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1400 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 73 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 76 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.opcode) = STP;}
-#line 1403 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1406 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 74 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 77 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.opcode) = NOP;}
-#line 1409 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1412 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 75 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 78 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.opcode) = DAT;}
-#line 1415 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1418 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 78 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 81 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.addr_mode) = IMM;}
-#line 1421 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1424 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 79 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 82 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.addr_mode) = DIRECT;}
-#line 1427 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1430 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 80 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 83 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.addr_mode) = INDIR_A;}
-#line 1433 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1436 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 81 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 84 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.addr_mode) = INDIR_B;}
-#line 1439 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1442 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 82 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 85 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.addr_mode) = PREDEC_A;}
-#line 1445 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1448 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 83 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 86 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.addr_mode) = POSTINC_A;}
-#line 1451 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1454 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 84 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 87 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.addr_mode) = PREDEC_B;}
-#line 1457 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1460 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 85 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 88 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.addr_mode) = POSTINC_B;}
-#line 1463 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1466 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 86 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 89 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.addr_mode) = DIRECT;}
-#line 1469 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1472 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 89 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 92 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.modifier) = A;}
-#line 1475 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1478 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 90 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 93 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.modifier) = B;}
-#line 1481 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1484 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 91 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 94 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.modifier) = AB;}
-#line 1487 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1490 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 92 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 95 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.modifier) = BA;}
-#line 1493 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1496 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 93 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 96 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.modifier) = F;}
-#line 1499 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1502 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 94 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 97 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.modifier) = X;}
-#line 1505 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1508 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 95 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 98 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.modifier) = I;}
-#line 1511 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1514 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 96 "interpreter/red.ypp" /* yacc.c:1646  */
+#line 99 "interpreter/red.ypp" /* yacc.c:1646  */
     {(yyval.modifier) = NONE;}
-#line 1517 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1520 "interpreter/red.tab.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 1521 "interpreter/red.tab.cpp" /* yacc.c:1646  */
+#line 1524 "interpreter/red.tab.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1745,7 +1748,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 98 "interpreter/red.ypp" /* yacc.c:1906  */
+#line 101 "interpreter/red.ypp" /* yacc.c:1906  */
 
 
 InstrNode addInstr(int opcode, int modifier, int mode_a, int arg1, int mode_b, int arg2){

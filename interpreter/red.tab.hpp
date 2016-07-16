@@ -81,7 +81,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 19 "interpreter/red.ypp" /* yacc.c:1909  */
+#line 22 "interpreter/red.ypp" /* yacc.c:1909  */
 
    char *charptr;
    char ch;

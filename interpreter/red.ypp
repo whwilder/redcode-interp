@@ -5,6 +5,9 @@
 #include <string.h>
 #include "parser.h"
 #include <vector>
+#define CORE_SIZE 8000
+#define MAX_CYCLES 8000
+#define MAX_PROCESSES 8000
 using namespace std;
 extern int yychar, yydebug, yylineno;
 extern char *yytext;

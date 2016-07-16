@@ -1,4 +1,5 @@
 #include <vector>
+#include <queue>
 #include "parser.h"
 
 //typedef struct InstrNode {
@@ -13,12 +14,12 @@
 
 class Core{
 public:
-   int *curr_pc;
+   int pc;
    int process_idx;
    int core_size;
    int max_cycles;
    int max_proc;
-   std::vector<int> pc;
+   std::queue<int> proc_queue;
    std::vector<InstrNode> core;
    int num_processes;
    Core(int size, int max_cycles, int max_proc);

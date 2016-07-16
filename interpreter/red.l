@@ -2,7 +2,7 @@
 extern int yychar;
 extern int errcode;
 void yyerror(char *s);
-#include "red.tab.h"
+#include "red.tab.hpp"
 %}
 
 %option noyywrap

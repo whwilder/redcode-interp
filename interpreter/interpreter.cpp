@@ -24,7 +24,7 @@ void Core::addInstrs(std::vector<InstrNode> instrs){
 }
 
 Core::Core(int size, int cycles, int proc) : 
-         core_size(size), max_cycles(cycles), max_proc(proc), pc(proc), core(size){
+         core_size(size), max_cycles(cycles), max_proc(proc), core(size){
    for(int i = 0; i < core_size; i++){
       core[i].opcode = 0;
       core[i].arg1 = 0;
@@ -38,61 +38,63 @@ Core::Core(int size, int cycles, int proc) :
 
 void Core::run(){
    int cycles = 0;
-   curr_pc = &pc[process_idx];
    while( cycles < MAX_CYCLES ){
-      InstrNode instr = core[*curr_pc];
+      pc = proc_queue.front();
+      InstrNode instr = core[pc];
       print_instr(instr);
       int err = 0;
       switch( instr.opcode ){
          case DAT:
-            dat( core[*curr_pc] );
+            dat( core[pc] );
             break;
          case MOV:
-            err = mov( core[*curr_pc] );
-            (*curr_pc)++;
+            err = mov( core[pc] );
+            (pc)++;
             break;
          case ADD:
-            err = add( core[*curr_pc] );
-            (*curr_pc)++;
+            err = add( core[pc] );
+            (pc)++;
             break;
          case SUB:
-            err = sub( core[*curr_pc] );
-            (*curr_pc)++;
+            err = sub( core[pc] );
+            (pc)++;
             break;
          case MUL:
-            err = mult( core[*curr_pc] );
-            (*curr_pc)++;
+            err = mult( core[pc] );
+            (pc)++;
             break;
          case DIV:
-            err = divd( core[*curr_pc] );
-            (*curr_pc)++;
+            err = divd( core[pc] );
+            (pc)++;
             break;
          case MOD:
-            err = mod( core[*curr_pc] );
-            (*curr_pc)++;
+            err = mod( core[pc] );
+            (pc)++;
             break;
          case JMP:
-            *curr_pc = jmp( core[*curr_pc] );
+            pc = jmp( core[pc] );
             break;
          case SPL:
-            spl( core[*curr_pc] );
-            (*curr_pc)++;
+            spl( core[pc] );
+            pc++;
             break;
          default:
             break;
       }
-      if( instr.opcode == DAT || err != 0)
-         break;
+      if( instr.opcode != DAT || err == 0){
+         proc_queue.pop();
+         pc %= core.size();
+         proc_queue.push(pc);
+      }
       cycles++;
-      process_idx = (process_idx + 1) % num_processes;
-      *curr_pc = pc[process_idx];
-      *curr_pc %= core.size();
    }
 }
 
 void Core::dat( InstrNode instr ){
-   pc.erase(pc.begin() + process_idx);
-   num_processes--;
+   /*
+    * When executing a DAT instruction, the current process is killed,
+    * so we remove it from the process queue
+    */
 }
 
 int Core::mov(InstrNode instr){
@@ -189,30 +191,29 @@ int Core::jmp( InstrNode instr ){
 int Core::spl( InstrNode instr ){
    int a = fetch_addr( instr.arg1, instr.mode_a);
    if (num_processes == MAX_PROCESSES)
-      return *curr_pc;
+      return pc;
    switch( instr.modifier ){
       case NONE:
-         pc.push_back(core[a].arg1);
-         num_processes++;
+         proc_queue.push(core[a].arg1);
          break;
    }
-   return *curr_pc;
+   return pc;
 }
 
 int Core::fetch_addr(int rel_addr, int addr_mode){
    switch(addr_mode){
       case IMM:
-         return *curr_pc;
+         return pc;
          break;
       case NONE:
       case DIRECT:
-         return (*curr_pc + rel_addr) % core.size();
+         return (pc + rel_addr) % core.size();
          break;
       case INDIR_A:
-         return (*curr_pc + rel_addr + core[*curr_pc+rel_addr].arg1) % core.size();
+         return (pc + rel_addr + core[pc+rel_addr].arg1) % core.size();
          break;
       case INDIR_B:
-         return (*curr_pc + rel_addr + core[*curr_pc+rel_addr].arg2) % core.size();
+         return (pc + rel_addr + core[pc+rel_addr].arg2) % core.size();
          break;
 /* Leave these alone till I can figure out how the fuck they're supposed to work
       case PREDEC_A:
@@ -229,7 +230,7 @@ int Core::fetch_addr(int rel_addr, int addr_mode){
          break;
 */
    }
-   return *curr_pc;
+   return pc;
 }
 
 
@@ -249,7 +250,12 @@ void Core::print_instr(InstrNode instr){
          break;
       case JMP:
          command = "JMP";
-         arg1 = (*(curr_pc) + instr.arg1) % 8000 - *(curr_pc);
+         arg1 = (pc + instr.arg1) % 8000 - pc;
+         arg2 = -1;
+         break;
+      case SPL:
+         command = "SPL";
+         arg1 = (pc + instr.arg1) % 8000 - pc;
          arg2 = -1;
          break;
       default:
@@ -257,10 +263,11 @@ void Core::print_instr(InstrNode instr){
          command = "HCF";
          break;
    }
-   cout << setw(4) << right << *(curr_pc) <<": " << command << " "
+   cout << setw(4) << right << pc <<": " << command << " "
                    << get_addr_char(instr.mode_a) << arg1; 
    if (arg2 > 0)
       cout << ", " << get_addr_char(instr.mode_b) << arg2;
+   cout << ": " << process_idx;
    cout << endl;
 }
 
