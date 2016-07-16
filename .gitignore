@@ -1,5 +1,7 @@
 *.tab.*
+interpreter/*.tab.*
 *.lex.*
+interpreter/*.lex.*
 .*.swp
 *.output
 *.red
