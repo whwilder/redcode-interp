@@ -78,6 +78,9 @@ void Core::run(){
          case JMZ:
             pc = jmz( core[pc] );
             break;
+         case JMN:
+            pc = jmn( core[pc] );
+            break;
          case DJN:
             pc = djn( core[pc] );
             break;
@@ -212,6 +215,29 @@ int Core::jmz( InstrNode instr ){
    }
    return ret_addr;
 }
+
+int Core::jmn( InstrNode instr ){
+   int addr_a = fetch_addr( instr.arg1, instr.mode_a);
+   int addr_b = fetch_addr( instr.arg2, instr.mode_a);
+   int cmp = core[addr_b].arg2;
+   int ret_addr = pc+1;
+   switch( instr.modifier ){
+      case NONE:
+      case AB:
+      case B:
+         if( cmp != 0)
+            ret_addr =  addr_a % core.size();
+         break;
+      case X:
+      case I:
+      case F:
+         if (core[addr_a].arg1 != 0 && cmp != 0 )
+            ret_addr = addr_a % core.size();
+         break;
+   }
+   return ret_addr;
+}
+
 int Core::djn( InstrNode instr ){
    int addr_a = fetch_addr( instr.arg1, instr.mode_a);
    int addr_b = fetch_addr( instr.arg2, instr.mode_a);
@@ -310,6 +336,21 @@ void Core::print_instr(InstrNode instr){
          command = "SPL";
          arg1 = (pc + instr.arg1) % 8000 - pc;
          arg2 = -1;
+         break;
+      case JMZ:
+         command = "JMZ";
+         arg1 = (pc + instr.arg1) % 8000 - pc;
+         arg2 = (pc + instr.arg2) % 8000 - pc;
+         break;
+      case JMN:
+         command = "JMN";
+         arg1 = (pc + instr.arg1) % 8000 - pc;
+         arg2 = (pc + instr.arg2) % 8000 - pc;
+         break;
+      case DJN:
+         command = "DJN";
+         arg1 = (pc + instr.arg1) % 8000 - pc;
+         arg2 = (pc + instr.arg2) % 8000 - pc;
          break;
       default:
          // if command is not recognized, halt and catch fire

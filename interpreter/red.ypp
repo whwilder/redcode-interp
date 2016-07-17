@@ -31,7 +31,7 @@ std::vector<InstrNode> nodes;
 
 /* tokens */
 
-%token <charptr>  OPDAT OPMOV OPADD OPSUB OPMUL OPDIV OPMOD OPJMP OPJMZ OPDJN OPSPL OPCMP OPSEQ OPSNE OPSLT OPLDP OPSTP OPNOP 
+%token <charptr>  OPDAT OPMOV OPADD OPSUB OPMUL OPDIV OPMOD OPJMP OPJMZ OPJMN OPDJN OPSPL OPCMP OPSEQ OPSNE OPSLT OPLDP OPSTP OPNOP 
 %token <charptr>  MOD_A MOD_B MOD_AB MOD_BA MOD_F MOD_X MOD_I
 %token <charptr>  STRING
 %token <ch>       ','
@@ -66,6 +66,7 @@ opcode : OPDAT {$$ = DAT;}
        | OPMOD {$$ = MOD;}
        | OPJMP {$$ = JMP;}
        | OPJMZ {$$ = JMZ;}
+       | OPJMN {$$ = JMN;}
        | OPDJN {$$ = DJN;}
        | OPSPL {$$ = SPL;}
        | OPCMP {$$ = CMP;}
