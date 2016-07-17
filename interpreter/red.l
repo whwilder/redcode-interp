@@ -33,6 +33,7 @@ LETTER [a-zA-Z]
 "MOD"                {yylval.charptr=strdup(yytext); return OPMOD;}
 "JMP"                {yylval.charptr=strdup(yytext); return OPJMP;}
 "JMZ"                {yylval.charptr=strdup(yytext); return OPJMZ;}
+"JMN"                {yylval.charptr=strdup(yytext); return OPJMN;}
 "DJN"                {yylval.charptr=strdup(yytext); return OPDJN;}
 "SPL"                {yylval.charptr=strdup(yytext); return OPSPL;}
 "CMP"                {yylval.charptr=strdup(yytext); return OPCMP;}

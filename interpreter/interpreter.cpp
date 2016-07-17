@@ -38,7 +38,7 @@ Core::Core(int size, int cycles, int proc) :
 
 void Core::run(){
    int cycles = 0;
-   while( cycles < MAX_CYCLES ){
+   while( cycles < MAX_CYCLES && !proc_queue.empty() ){
       pc = proc_queue.front();
       proc_queue.pop();
       InstrNode instr = core[pc];
@@ -245,7 +245,7 @@ int Core::djn( InstrNode instr ){
    int ret_addr = pc+1;
    switch( instr.modifier ){
       case NONE:
-         core[addr_b].arg2++;
+         core[addr_b].arg2--;
          if( core[addr_b].arg2 != 0 )
             ret_addr = addr_a % core.size();
          break;
@@ -258,8 +258,8 @@ int Core::djn( InstrNode instr ){
          break;
       case I:
       case F:
-         core[addr_a].arg1++;
-         core[addr_b].arg2++;
+         core[addr_a].arg1--;
+         core[addr_b].arg2--;
          if (core[addr_b].arg1 != 0 && core[addr_b].arg2 != 0 )
             ret_addr = addr_a % core.size();
          break;
