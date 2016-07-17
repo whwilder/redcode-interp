@@ -34,6 +34,9 @@ public:
    int divd( InstrNode instr );
    int mod( InstrNode instr );
    int jmp( InstrNode instr );
+   int jmz( InstrNode instr );
+   int jmn( InstrNode instr );
+   int djn( InstrNode instr );
    int spl( InstrNode instr );
    void print_instr( InstrNode instr );
    char get_addr_char( int addr_mode );

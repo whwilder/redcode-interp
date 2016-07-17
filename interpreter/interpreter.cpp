@@ -40,12 +40,13 @@ void Core::run(){
    int cycles = 0;
    while( cycles < MAX_CYCLES ){
       pc = proc_queue.front();
+      proc_queue.pop();
       InstrNode instr = core[pc];
       print_instr(instr);
       int err = 0;
       switch( instr.opcode ){
          case DAT:
-            dat( core[pc] );
+            err = 1;
             break;
          case MOV:
             err = mov( core[pc] );
@@ -56,11 +57,11 @@ void Core::run(){
             (pc)++;
             break;
          case SUB:
-            err = sub( core[pc] );
+            sub( core[pc] );
             (pc)++;
             break;
          case MUL:
-            err = mult( core[pc] );
+            mult( core[pc] );
             (pc)++;
             break;
          case DIV:
@@ -74,6 +75,12 @@ void Core::run(){
          case JMP:
             pc = jmp( core[pc] );
             break;
+         case JMZ:
+            pc = jmz( core[pc] );
+            break;
+         case DJN:
+            pc = djn( core[pc] );
+            break;
          case SPL:
             spl( core[pc] );
             pc++;
@@ -81,8 +88,11 @@ void Core::run(){
          default:
             break;
       }
+      /*
+       * We only push the pc back on to the queue if we haven't run into an error
+       * (DAT instruction or division by 0)
+       */
       if( instr.opcode != DAT || err == 0){
-         proc_queue.pop();
          pc %= core.size();
          proc_queue.push(pc);
       }
@@ -90,111 +100,154 @@ void Core::run(){
    }
 }
 
-void Core::dat( InstrNode instr ){
-   /*
-    * When executing a DAT instruction, the current process is killed,
-    * so we remove it from the process queue
-    */
-}
-
 int Core::mov(InstrNode instr){
-   int a = fetch_addr(instr.arg1, instr.mode_a);
-   int b = fetch_addr(instr.arg2, instr.mode_b);
+   int addr_a = fetch_addr(instr.arg1, instr.mode_a);
+   int addr_b = fetch_addr(instr.arg2, instr.mode_b);
    switch(instr.modifier){
       case NONE:
       case I:
-         core[b].opcode   = core[a].opcode;
-         core[b].arg1     = core[a].arg1;
-         core[b].arg2     = core[a].arg2;
-         core[b].mode_a   = core[a].mode_a;
-         core[b].mode_b   = core[a].mode_b;
-         core[b].modifier = core[a].modifier;
+         core[addr_b].opcode   = core[addr_a].opcode;
+         core[addr_b].arg1     = core[addr_a].arg1;
+         core[addr_b].arg2     = core[addr_a].arg2;
+         core[addr_b].mode_a   = core[addr_a].mode_a;
+         core[addr_b].mode_b   = core[addr_a].mode_b;
+         core[addr_b].modifier = core[addr_a].modifier;
       break;
    }
    return 0;
 }
 
 int Core::add( InstrNode instr ){
-   int a = fetch_addr(instr.arg1, instr.mode_a);
-   int b = fetch_addr(instr.arg2, instr.mode_b);
+   int addr_a = fetch_addr(instr.arg1, instr.mode_a);
+   int addr_b = fetch_addr(instr.arg2, instr.mode_b);
    switch( instr.modifier ){
       case NONE:
       case AB:
-         core[b].arg2 = (core[a].arg1+core[b].arg1) % core.size();
+         core[addr_b].arg2 = (core[addr_a].arg1+core[addr_b].arg1) % core.size();
          break;
    }
    return 0;
 }
 
 int Core::sub( InstrNode instr ){
-   int a = fetch_addr(instr.arg1, instr.mode_a);
-   int b = fetch_addr(instr.arg2, instr.mode_b);
+   int addr_a = fetch_addr(instr.arg1, instr.mode_a);
+   int addr_b = fetch_addr(instr.arg2, instr.mode_b);
    switch( instr.modifier ){
       case NONE:
       case AB:
-         core[b].arg2 = (core[a].arg1-core[b].arg1) % core.size();
+         core[addr_b].arg2 = (core[addr_a].arg1-core[addr_b].arg1) % core.size();
          break;
    }
    return 0;
 }
 
 int Core::mult( InstrNode instr ){
-   int a = fetch_addr(instr.arg1, instr.mode_a);
-   int b = fetch_addr(instr.arg2, instr.mode_b);
+   int addr_a = fetch_addr(instr.arg1, instr.mode_a);
+   int addr_b = fetch_addr(instr.arg2, instr.mode_b);
    switch( instr.modifier ){
       case NONE:
       case AB:
-         core[b].arg2 = ( core[a].arg1 * core[b].arg1 ) % core.size();
+         core[addr_b].arg2 = ( core[addr_a].arg1 * core[addr_b].arg1 ) % core.size();
          break;
    }
    return 0;
 }
 
 int Core::divd( InstrNode instr ){
-   int a = fetch_addr(instr.arg1, instr.mode_a);
-   int b = fetch_addr(instr.arg2, instr.mode_b);
-   if( core[b].arg2 == 0)
-      return 1;
+   int addr_a = fetch_addr(instr.arg1, instr.mode_a);
+   int addr_b = fetch_addr(instr.arg2, instr.mode_b);
+   if( core[addr_b].arg2 == 0)
+      return 2;
    switch( instr.modifier ){
       case NONE:
       case AB:
-         core[b].arg2 = ( core[a].arg1 / core[b].arg1 ) % core.size();
+         core[addr_b].arg2 = ( core[addr_a].arg1 / core[addr_b].arg1 ) % core.size();
          break;
    }
    return 0;
 }
 
 int Core::mod( InstrNode instr ){
-   int a = fetch_addr(instr.arg1, instr.mode_a);
-   int b = fetch_addr(instr.arg2, instr.mode_b);
-   if( core[b].arg2 == 0)
-      return 1;
+   int addr_a = fetch_addr(instr.arg1, instr.mode_a);
+   int addr_b = fetch_addr(instr.arg2, instr.mode_b);
+   if( core[addr_b].arg2 == 0)
+      return 2;
    switch( instr.modifier ){
       case NONE:
       case AB:
-         core[b].arg2 = ( core[a].arg1 % core[b].arg1 ) % core.size();
+         core[addr_b].arg2 = ( core[addr_a].arg1 % core[addr_b].arg1 ) % core.size();
          break;
    }
    return 0;
 }
 
 int Core::jmp( InstrNode instr ){
-   int a = fetch_addr( instr.arg1, instr.mode_a);
+   int addr_a = fetch_addr( instr.arg1, instr.mode_a);
    switch( instr.modifier ){
       case NONE:
-         return  a % core.size();
+         return  addr_a % core.size();
          break;
    }
    return 0;
 }
 
+int Core::jmz( InstrNode instr ){
+   int addr_a = fetch_addr( instr.arg1, instr.mode_a);
+   int addr_b = fetch_addr( instr.arg2, instr.mode_a);
+   int cmp = core[addr_b].arg2;
+   int ret_addr = pc+1;
+   switch( instr.modifier ){
+      case NONE:
+      case AB:
+      case B:
+         if( cmp == 0)
+            ret_addr =  addr_a % core.size();
+         break;
+      case X:
+      case I:
+      case F:
+         if (core[addr_a].arg1 == 0 && cmp == 0 )
+            ret_addr = addr_a % core.size();
+         break;
+   }
+   return ret_addr;
+}
+int Core::djn( InstrNode instr ){
+   int addr_a = fetch_addr( instr.arg1, instr.mode_a);
+   int addr_b = fetch_addr( instr.arg2, instr.mode_a);
+   int cmp = core[addr_b].arg2;
+   int ret_addr = pc+1;
+   switch( instr.modifier ){
+      case NONE:
+         core[addr_b].arg2++;
+         if( core[addr_b].arg2 != 0 )
+            ret_addr = addr_a % core.size();
+         break;
+      case AB:
+      case B:
+         if( cmp != 0)
+            ret_addr =  addr_a % core.size();
+         break;
+      case X:
+         break;
+      case I:
+      case F:
+         core[addr_a].arg1++;
+         core[addr_b].arg2++;
+         if (core[addr_b].arg1 != 0 && core[addr_b].arg2 != 0 )
+            ret_addr = addr_a % core.size();
+         break;
+   }
+   return ret_addr;
+}
+
 int Core::spl( InstrNode instr ){
-   int a = fetch_addr( instr.arg1, instr.mode_a);
+   int addr_a = fetch_addr( instr.arg1, instr.mode_a);
    if (num_processes == MAX_PROCESSES)
       return pc;
    switch( instr.modifier ){
       case NONE:
-         proc_queue.push(core[a].arg1);
+         proc_queue.push(core[addr_a].arg1);
          break;
    }
    return pc;
