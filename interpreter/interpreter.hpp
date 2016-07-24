@@ -26,6 +26,7 @@ public:
 
    void addInstrs(std::vector<InstrNode> instrs);
    void run();
+   void dump();
    void dat( InstrNode instr );
    int mov( InstrNode instr );
    int add( InstrNode instr );

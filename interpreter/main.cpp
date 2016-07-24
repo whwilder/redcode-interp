@@ -20,4 +20,5 @@ int main(int argc, char **argv){
    interp->proc_queue.push(0);
    interp->addInstrs(nodes);
    interp->run();
+   interp->dump();
 }

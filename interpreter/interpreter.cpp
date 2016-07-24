@@ -42,7 +42,7 @@ void Core::run(){
       pc = proc_queue.front();
       proc_queue.pop();
       InstrNode instr = core[pc];
-      print_instr(instr);
+      //print_instr(instr);
       int err = 0;
       switch( instr.opcode ){
          case DAT:
@@ -88,6 +88,9 @@ void Core::run(){
             spl( core[pc] );
             pc++;
             break;
+         case SEQ:
+            //pc = seq( core[pc] );
+            break;
          default:
             break;
       }
@@ -103,6 +106,12 @@ void Core::run(){
    }
 }
 
+void Core::dump(){
+   std::vector<InstrNode>::iterator it = core.begin();
+   for( ; it != core.end(); it++ )
+      print_instr(*it);
+}
+
 int Core::mov(InstrNode instr){
    int addr_a = fetch_addr(instr.arg1, instr.mode_a);
    int addr_b = fetch_addr(instr.arg2, instr.mode_b);
@@ -115,7 +124,27 @@ int Core::mov(InstrNode instr){
          core[addr_b].mode_a   = core[addr_a].mode_a;
          core[addr_b].mode_b   = core[addr_a].mode_b;
          core[addr_b].modifier = core[addr_a].modifier;
-      break;
+         break;
+      case A:
+         core[addr_b].arg1     = core[addr_a].arg1;
+         break;
+      case B:
+         core[addr_b].arg2     = core[addr_a].arg2;
+         break;
+      case AB:
+         core[addr_b].arg2     = core[addr_a].arg1;
+         break;
+      case BA:
+         core[addr_b].arg1     = core[addr_a].arg2;
+         break;
+      case F:
+         core[addr_b].arg1     = core[addr_a].arg1;
+         core[addr_b].arg2     = core[addr_a].arg2;
+         break;
+      case X:
+         core[addr_b].arg2     = core[addr_a].arg1;
+         core[addr_b].arg1     = core[addr_a].arg2;
+         break;
    }
    return 0;
 }
@@ -126,7 +155,25 @@ int Core::add( InstrNode instr ){
    switch( instr.modifier ){
       case NONE:
       case AB:
-         core[addr_b].arg2 = (core[addr_a].arg1+core[addr_b].arg1) % core.size();
+         core[addr_b].arg2 = ( core[addr_a].arg1 + core[addr_b].arg2 ) % core.size();
+         break;
+      case A:
+         core[addr_b].arg1 = ( core[addr_a].arg1 + core[addr_b].arg1 ) % core.size();
+         break;
+      case B:
+         core[addr_b].arg2 = ( core[addr_a].arg2 + core[addr_b].arg2 ) % core.size();
+         break;
+      case BA:
+         core[addr_b].arg1 = ( core[addr_a].arg2 + core[addr_b].arg1 ) % core.size();
+         break;
+      case I:
+      case F:
+         core[addr_b].arg1 = ( core[addr_a].arg1 + core[addr_b].arg1 ) % core.size();
+         core[addr_b].arg2 = ( core[addr_a].arg2 + core[addr_b].arg2 ) % core.size();
+         break;
+      case X:
+         core[addr_b].arg2 = ( core[addr_a].arg1 + core[addr_b].arg1 ) % core.size();
+         core[addr_b].arg1 = ( core[addr_a].arg2 + core[addr_b].arg2 ) % core.size();
          break;
    }
    return 0;
@@ -138,7 +185,25 @@ int Core::sub( InstrNode instr ){
    switch( instr.modifier ){
       case NONE:
       case AB:
-         core[addr_b].arg2 = (core[addr_a].arg1-core[addr_b].arg1) % core.size();
+         core[addr_b].arg2 = ( core[addr_a].arg1 - core[addr_b].arg2 ) % core.size();
+         break;
+      case A:
+         core[addr_b].arg1 = ( core[addr_a].arg1 - core[addr_b].arg1 ) % core.size();
+         break;
+      case B:
+         core[addr_b].arg2 = ( core[addr_a].arg2 - core[addr_b].arg2 ) % core.size();
+         break;
+      case BA:
+         core[addr_b].arg1 = ( core[addr_a].arg2 - core[addr_b].arg1 ) % core.size();
+         break;
+      case I:
+      case F:
+         core[addr_b].arg1 = ( core[addr_a].arg1 - core[addr_b].arg1 ) % core.size();
+         core[addr_b].arg2 = ( core[addr_a].arg2 - core[addr_b].arg2 ) % core.size();
+         break;
+      case X:
+         core[addr_b].arg2 = ( core[addr_a].arg1 - core[addr_b].arg1 ) % core.size();
+         core[addr_b].arg1 = ( core[addr_a].arg2 - core[addr_b].arg2 ) % core.size();
          break;
    }
    return 0;
@@ -150,7 +215,25 @@ int Core::mult( InstrNode instr ){
    switch( instr.modifier ){
       case NONE:
       case AB:
+         core[addr_b].arg2 = ( core[addr_a].arg1 * core[addr_b].arg2 ) % core.size();
+         break;
+      case A:
+         core[addr_b].arg1 = ( core[addr_a].arg1 * core[addr_b].arg1 ) % core.size();
+         break;
+      case B:
+         core[addr_b].arg2 = ( core[addr_a].arg2 * core[addr_b].arg2 ) % core.size();
+         break;
+      case BA:
+         core[addr_b].arg1 = ( core[addr_a].arg2 * core[addr_b].arg1 ) % core.size();
+         break;
+      case I:
+      case F:
+         core[addr_b].arg1 = ( core[addr_a].arg1 * core[addr_b].arg1 ) % core.size();
+         core[addr_b].arg2 = ( core[addr_a].arg2 * core[addr_b].arg2 ) % core.size();
+         break;
+      case X:
          core[addr_b].arg2 = ( core[addr_a].arg1 * core[addr_b].arg1 ) % core.size();
+         core[addr_b].arg1 = ( core[addr_a].arg2 * core[addr_b].arg2 ) % core.size();
          break;
    }
    return 0;
@@ -164,7 +247,25 @@ int Core::divd( InstrNode instr ){
    switch( instr.modifier ){
       case NONE:
       case AB:
+         core[addr_b].arg2 = ( core[addr_a].arg1 / core[addr_b].arg2 ) % core.size();
+         break;
+      case A:
+         core[addr_b].arg1 = ( core[addr_a].arg1 / core[addr_b].arg1 ) % core.size();
+         break;
+      case B:
+         core[addr_b].arg2 = ( core[addr_a].arg2 / core[addr_b].arg2 ) % core.size();
+         break;
+      case BA:
+         core[addr_b].arg1 = ( core[addr_a].arg2 / core[addr_b].arg1 ) % core.size();
+         break;
+      case I:
+      case F:
+         core[addr_b].arg1 = ( core[addr_a].arg1 / core[addr_b].arg1 ) % core.size();
+         core[addr_b].arg2 = ( core[addr_a].arg2 / core[addr_b].arg2 ) % core.size();
+         break;
+      case X:
          core[addr_b].arg2 = ( core[addr_a].arg1 / core[addr_b].arg1 ) % core.size();
+         core[addr_b].arg1 = ( core[addr_a].arg2 / core[addr_b].arg2 ) % core.size();
          break;
    }
    return 0;
@@ -178,7 +279,25 @@ int Core::mod( InstrNode instr ){
    switch( instr.modifier ){
       case NONE:
       case AB:
+         core[addr_b].arg2 = ( core[addr_a].arg1 % core[addr_b].arg2 ) % core.size();
+         break;
+      case A:
+         core[addr_b].arg1 = ( core[addr_a].arg1 % core[addr_b].arg1 ) % core.size();
+         break;
+      case B:
+         core[addr_b].arg2 = ( core[addr_a].arg2 % core[addr_b].arg2 ) % core.size();
+         break;
+      case BA:
+         core[addr_b].arg1 = ( core[addr_a].arg2 % core[addr_b].arg1 ) % core.size();
+         break;
+      case I:
+      case F:
+         core[addr_b].arg1 = ( core[addr_a].arg1 % core[addr_b].arg1 ) % core.size();
+         core[addr_b].arg2 = ( core[addr_a].arg2 % core[addr_b].arg2 ) % core.size();
+         break;
+      case X:
          core[addr_b].arg2 = ( core[addr_a].arg1 % core[addr_b].arg1 ) % core.size();
+         core[addr_b].arg1 = ( core[addr_a].arg2 % core[addr_b].arg2 ) % core.size();
          break;
    }
    return 0;
@@ -186,12 +305,11 @@ int Core::mod( InstrNode instr ){
 
 int Core::jmp( InstrNode instr ){
    int addr_a = fetch_addr( instr.arg1, instr.mode_a);
-   switch( instr.modifier ){
-      case NONE:
-         return  addr_a % core.size();
-         break;
-   }
-   return 0;
+   /* 
+    * JMP ignores whatever modifier it might have, so the pc simply becomes whatever is in 
+    * the A-field ( as dictated by the address mode )
+    */
+   return  addr_a % core.size();
 }
 
 int Core::jmz( InstrNode instr ){
@@ -279,6 +397,20 @@ int Core::spl( InstrNode instr ){
    return pc;
 }
 
+//int Core::seq( InstrNode instr ){
+//   int addr_a = fetch_addr( instr.arg1, instr.mode_a);
+//   int addr_b = fetch_addr( instr.arg2, instr.mode_b);
+//   ret_addr = pc + 1;
+//   switch( instr.modifier ){
+//      case NONE:
+//         if( core[addr_a].arg1 == core[addr_b].arg2){
+//            ret_addr++;
+//         }
+//         break;
+//   }
+//   return ret_addr;
+//}
+
 int Core::fetch_addr(int rel_addr, int addr_mode){
    switch(addr_mode){
       case IMM:
@@ -359,7 +491,7 @@ void Core::print_instr(InstrNode instr){
    }
    cout << setw(4) << right << pc <<": " << command << " "
                    << get_addr_char(instr.mode_a) << arg1; 
-   if (arg2 > 0)
+   if (arg2 > -1)
       cout << ", " << get_addr_char(instr.mode_b) << arg2;
    cout << ": " << process_idx;
    cout << endl;
