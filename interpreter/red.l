@@ -13,6 +13,7 @@ void yyerror(char *s);
 
 DIGIT [0-9]
 LETTER [a-zA-Z]
+ALPHANUM [0-9a-zA-Z]
 
 %s COMMENT
 
@@ -52,6 +53,7 @@ LETTER [a-zA-Z]
 ".I"                 {yylval.charptr=strdup(yytext); return MOD_I;}
 ","                  {yylval.ch=yytext[0]; return yytext[0];}
 [#$*@{}<>]           {yylval.ch=yytext[0]; return yytext[0];}
+{LETTER}{ALPHANUM}*  {yylval.charptr=strdup(yytext); return LABEL;}
 [[:space:]]
 .                    {yylval.ch=yytext[0];return UNKNOWN;}
 

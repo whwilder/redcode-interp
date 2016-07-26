@@ -13,6 +13,7 @@ extern int yychar, yydebug, yylineno;
 extern char *yytext;
 extern int yylex();
 void yyerror(char *s);
+int get_modifier( int opcode, int modifier, int mode_a, int mode_b );
 
 InstrNode addInstr(int opcode, int modifier, int mode_a, int arg1, int mode_b, int arg2);
 void print_tok();
@@ -33,7 +34,7 @@ std::vector<InstrNode> nodes;
 
 %token <charptr>  OPDAT OPMOV OPADD OPSUB OPMUL OPDIV OPMOD OPJMP OPJMZ OPJMN OPDJN OPSPL OPCMP OPSEQ OPSNE OPSLT OPLDP OPSTP OPNOP 
 %token <charptr>  MOD_A MOD_B MOD_AB MOD_BA MOD_F MOD_X MOD_I
-%token <charptr>  STRING
+%token <charptr>  STRING LABEL
 %token <ch>       ','
 %token <ch>       UNKNOWN
 %token <intcon>   INTCON
@@ -53,6 +54,7 @@ stmt : opcode modifier addr_mode INTCON ',' addr_mode INTCON {addInstr($1, $2, $
      | opcode modifier error INTCON ',' error INTCON
      | comment
      ;
+
 
 comment : ';' STRING
         ;
@@ -108,12 +110,51 @@ InstrNode addInstr(int opcode, int modifier, int mode_a, int arg1, int mode_b, i
    node.arg2 = arg2 % CORE_SIZE;
    node.mode_a = mode_a;
    node.mode_b = mode_b;
-   node.modifier = modifier;
+   node.modifier = get_modifier( opcode, modifier, mode_a, mode_b );
 
    if( node.arg1 < 0 ){ node.arg1 += CORE_SIZE; }
    if( node.arg2 < 0 ){ node.arg2 += CORE_SIZE; }
    nodes.push_back( node );
    return node;
+}
+
+/*
+ * If an instruction doesn't have a modifier, we need to determine the default behavior
+ * based on the address modifiers and opcode
+ */
+int get_modifier( int opcode, int modifier, int mode_a, int mode_b ){
+   if( modifier != NONE )
+      return modifier;
+   switch( opcode ){
+      case DAT:
+         return F;
+      case MOV:
+         if( mode_a == IMM) return AB;
+         else if( mode_b == IMM ) return B;
+         else return I;
+         break;
+      case ADD:
+      case SUB:
+      case MUL:
+      case DIV:
+      case MOD:
+         if( mode_a == IMM) return AB;
+         else if( mode_b == IMM ) return B;
+         else return F;
+         break;
+      case SLT:
+         if( mode_a == IMM ) return AB;
+         else return B;
+         break;
+      case JMP:
+      case JMZ:
+      case JMN:
+      case DJN:
+      case SPL:
+         return B;
+         break;
+   }
+   return modifier;
 }
 
 void print_tok(){

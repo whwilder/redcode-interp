@@ -9,8 +9,10 @@
 
 Core *interp;
 extern std::vector<InstrNode> nodes;
+extern FILE *yyin;
 
 int main(int argc, char **argv){
+   yyin = fopen(argv[1], "r");
    yyparse();
 
    interp = new Core(CORE_SIZE, MAX_CYCLES, MAX_PROCESSES);
