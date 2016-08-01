@@ -1,7 +1,6 @@
 #include "interpreter.hpp"
 #include <iostream>
 #include <iomanip>
-#include <string>
 #include <algorithm>
 using namespace std;
 
@@ -109,7 +108,7 @@ void Core::run(){
 void Core::dump(){
    std::vector<InstrNode>::iterator it = core.begin();
    for( ; it != core.end(); it++ )
-      print_instr(*it);
+      print_instr(*it, it - core.begin() );
 }
 
 int Core::mov(InstrNode instr){
@@ -362,13 +361,9 @@ int Core::djn( InstrNode instr ){
    int cmp = core[addr_b].arg2;
    int ret_addr = pc+1;
    switch( instr.modifier ){
-      case NONE:
-         core[addr_b].arg2--;
-         if( core[addr_b].arg2 != 0 )
-            ret_addr = addr_a % core.size();
-         break;
       case AB:
       case B:
+         core[addr_b].arg2--;
          if( cmp != 0)
             ret_addr =  addr_a % core.size();
          break;
@@ -390,7 +385,7 @@ int Core::spl( InstrNode instr ){
    if (num_processes == MAX_PROCESSES)
       return pc;
    switch( instr.modifier ){
-      case NONE:
+      case B:
          proc_queue.push(core[addr_a].arg1);
          break;
    }
@@ -445,7 +440,7 @@ int Core::fetch_addr(int rel_addr, int addr_mode){
 }
 
 
-void Core::print_instr(InstrNode instr){
+void Core::print_instr(InstrNode instr, int addr){
    std::string command;
    int arg1 = instr.arg1;
    int arg2 = instr.arg2;
@@ -489,12 +484,39 @@ void Core::print_instr(InstrNode instr){
          command = "HCF";
          break;
    }
-   cout << setw(4) << right << pc <<": " << command << " "
+   cout << setw(4) << right << addr <<": " << command << "." << get_modifier(instr.modifier) << " "
                    << get_addr_char(instr.mode_a) << arg1; 
    if (arg2 > -1)
       cout << ", " << get_addr_char(instr.mode_b) << arg2;
    cout << ": " << process_idx;
    cout << endl;
+}
+
+std::string Core::get_modifier( int modifier ){
+   switch( modifier ){
+      case A:
+         return "A";
+         break;
+      case B:
+         return "B";
+         break;
+      case AB:
+         return "AB";
+         break;
+      case BA:
+         return "BA";
+         break;
+      case I:
+         return "I";
+         break;
+      case F:
+         return "F";
+         break;
+      case X:
+         return "X";
+         break;
+   }
+   return "U";
 }
 
 char Core::get_addr_char(int addr_mode){

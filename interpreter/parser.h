@@ -13,7 +13,7 @@ typedef struct InstrNode {
 
 enum opCode {DAT, MOV, ADD, SUB, MUL, DIV, MOD, JMP, JMZ, JMN, DJN, SPL, CMP, SEQ, SNE, SLT, LDP,   STP, NOP};
 enum addr_mode {IMM, DIRECT, INDIR_A, INDIR_B, PREDEC_A, PREDEC_B, POSTINC_A, POSTINC_B};
-enum modifier  {A, B, AB, BA, F, X, I, NONE};
+enum modifier  {F, A, B, AB, BA, X, I, NONE};
 
 typedef enum opCode OpCode;
 typedef enum addr_mode addr_mode;

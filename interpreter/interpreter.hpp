@@ -1,6 +1,7 @@
 #include <vector>
 #include <queue>
 #include "parser.h"
+#include <string>
 
 //typedef struct InstrNode {
 //   int opcode;
@@ -39,7 +40,8 @@ public:
    int jmn( InstrNode instr );
    int djn( InstrNode instr );
    int spl( InstrNode instr );
-   void print_instr( InstrNode instr );
+   void print_instr( InstrNode instr, int addr );
+   std::string get_modifier( int modifier );
    char get_addr_char( int addr_mode );
    int fetch_addr(int rel_addr, int addr_mode);
 
